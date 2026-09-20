@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — RadarScan{% endblock %}
+
+{% block content %}
+<div class="dash-wrap">
+  <div class="dash-header">
+    <h1>Start a new scan</h1>
+    <p>Enter your test target's URL and run the automated scan pipeline.</p>
+  </div>
+
+  <div class="dash-grid">
+    <div class="panel">
+      <h2>Target</h2>
+      <div class="field">
+        <label for="target_url">Website URL</label>
+        <input type="text" id="target_url" placeholder="http://127.0.0.1:5001">
+      </div>
+      <button id="start_scan_btn" class="btn btn-primary btn-block">Start scan</button>
+
+      <ul class="pipeline-list">
+        <li>Security Headers</li>
+        <li>SQL Injection</li>
+        <li>XSS</li>
+        <li>IDOR</li>
+        <li>API Security</li>
+      </ul>
+
+      <div class="recent-scans">
+        <h2>Recent scans</h2>
+        {% if recent_scans %}
+        <table>
+          <thead>
+            <tr><th>Target</th><th>Status</th><th>Findings</th></tr>
+          </thead>
+          <tbody>
+            {% for scan in recent_scans %}
+            <tr>
+              <td>{{ scan.target_url[:30] }}</td>
+              <td>{{ scan.status }}</td>
+              <td>{{ scan.findings_count }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">You haven't run a scan yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div>
+      <div class="terminal">
+        <div class="terminal-header">
+          <span>Live Log</span>
+          <span id="status_pill" class="status-pill"><span class="dot"></span> idle</span>
+        </div>
+        <div class="terminal-body" id="terminal_body">
+          <div class="empty-state" id="empty_state">Scan logs will stream here in real time once you hit "Start scan"</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 20px;">
+        <h2>Findings</h2>
+        <ul class="findings-list" id="findings_list"></ul>
+        <p class="empty-state" id="no_findings">No findings yet.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
