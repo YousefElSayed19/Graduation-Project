@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Scan details — RadarScan{% endblock %}
+
+{% block content %}
+<div class="scan-detail-header">
+  <div>
+    <a href="{{ url_for('dashboard.index') }}" class="back-link">← Back to dashboard</a>
+    <h1>{{ scan.target_url }}</h1>
+    <div class="meta">
+      Started {{ scan.started_at.strftime("%Y-%m-%d %H:%M UTC") }}
+      · Status: <span class="status-pill {{ scan.status }}"><span class="dot"></span> {{ scan.status }}</span>
+      · {{ scan.findings_count }} finding(s)
+    </div>
+  </div>
+</div>
+
+<div class="dash-wrap" style="padding-top: 20px;">
+  <div class="panel">
+    <h2>Findings</h2>
+    <ul class="findings-list">
+      {% for f in findings %}
+      <li class="finding-card">
+        <div class="finding-top">
+          <span class="finding-type">{{ f.type }}</span>
+          <span class="severity {{ f.severity }}">{{ f.severity }}</span>
+        </div>
+        <p class="finding-desc">{{ f.description }}</p>
+        <p class="finding-desc" style="margin-top:4px; opacity:0.7;">{{ f.location }}</p>
+      </li>
+      {% else %}
+      <p class="empty-state">No findings were recorded for this scan.</p>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% if logs %}
+  <div class="terminal" style="margin-top: 20px; height: 320px;">
+    <div class="terminal-header">
+      <span>Scan Log</span>
+    </div>
+    <div class="terminal-body">
+      {% for log in logs %}
+      <div class="log-line level-{{ log.level }}">{{ log.message }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

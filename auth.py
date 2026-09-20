@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 from extensions import db, oauth
 from models import User
+from plans import get_plan
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -11,6 +12,10 @@ auth_bp = Blueprint("auth", __name__)
 def register():
     if current_user.is_authenticated:
         return redirect(url_for("dashboard.index"))
+
+    # carries a plan choice over from the pricing page, if any
+    preselected_plan = request.values.get("plan", "")
+    preselected_cycle = request.values.get("cycle", "monthly")
 
     if request.method == "POST":
         username = request.form.get("username", "").strip()
@@ -31,14 +36,24 @@ def register():
 
         user = User(username=username, email=email, auth_provider="local")
         user.set_password(password)
+
+        chosen_plan = request.form.get("plan_id", "")
+        if chosen_plan and get_plan(chosen_plan) and chosen_plan != "free":
+            user.plan = chosen_plan
+            user.billing_cycle = request.form.get("billing_cycle", "monthly")
+
         db.session.add(user)
         db.session.commit()
 
         login_user(user)
         flash("Account created successfully!", "success")
+
+        if chosen_plan and chosen_plan != "free":
+            flash(f"You're starting on the {get_plan(chosen_plan)['name']} plan (demo — no real payment taken).", "info")
+
         return redirect(url_for("dashboard.index"))
 
-    return render_template("register.html")
+    return render_template("register.html", preselected_plan=preselected_plan, preselected_cycle=preselected_cycle)
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])

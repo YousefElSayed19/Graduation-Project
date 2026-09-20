@@ -10,19 +10,39 @@ results live to a web dashboard.
 
 ## What it does
 
-1. You log in (email/password or Google), open the dashboard, and enter
-   a target URL.
-2. `main.py` runs 5 scanner scripts against that target, one after the
-   other: **Security Headers**, **SQL Injection**, **XSS**, **IDOR**,
-   **API Security**.
-3. Every log line each scanner produces streams live into the dashboard
-   terminal as it happens.
-4. Findings (vulnerability type, severity, location, description) are
-   collected and shown in a results panel.
+1. Browse the public site: **Home**, **Features** (the scan catalog), **Pricing** (plans + monthly/annual billing), and **About**.
+2. Create an account (email/password or Google) — optionally starting on a paid plan picked from the Pricing page.
+3. On the dashboard, enter a target URL. `main.py` runs 5 scanner scripts against it, one after the other: **Security Headers**, **SQL Injection**, **XSS**, **IDOR**, **API Security**.
+4. Every log line each scanner produces streams live into the dashboard terminal as it happens, and your daily scan usage (tied to your plan's limit) is shown at the top.
+5. Findings are saved per scan — click any row in "Recent scans" to open a full **scan detail page** with every finding and the original log, even after a server restart.
+6. From your **Account** page, switch plans any time (demo billing — no real payment processor is wired up yet).
 
 A small intentionally-vulnerable Flask app (`vulnerable_target/`) is
 included so you can test the scanners safely, without touching a real
 website.
+
+## Pages
+
+| Route | What's there |
+|---|---|
+| `/` | Landing page |
+| `/features` | Scan catalog — what each of the 5 modules does, plus "how it works" |
+| `/pricing` | Plan cards (Free / Student / Pro / Team), monthly ↔ annual toggle |
+| `/about` | Project description + responsible-use notice |
+| `/register`, `/login` | Auth (email/password + Google OAuth) |
+| `/dashboard` | Start a scan, watch live logs, see recent scans |
+| `/dashboard/scans/<scan_uid>` | Full detail view of one past scan |
+| `/account` | Profile info, usage stats, plan switcher |
+
+## Plans (demo billing)
+
+Plan data lives in `plans.py` — a single source of truth used by both
+the pricing page and the account page. Selecting a plan (at signup, from
+Pricing, or from Account) just updates the user's `plan` /
+`billing_cycle` columns instantly; there's no real payment processor
+connected yet, and the UI says so wherever a plan is chosen. Each plan
+carries a daily scan limit (`User.scan_limit_per_day`), enforced when a
+scan is started.
 
 ## Project structure
 
@@ -32,11 +52,13 @@ vuln_scanner_project/
 ├── main.py                  # Orchestrator: runs every scanner in order
 ├── scan_manager.py          # In-memory scan state (logs/status/findings), polled live
 ├── auth.py                  # Register / login / Google OAuth
-├── dashboard.py              # Dashboard page + scan start/poll API
-├── main_routes.py            # Landing page
-├── models.py                  # DB models (User, Scan)
-├── extensions.py              # db / login_manager / oauth instances
-├── config.py                   # App config (reads from .env)
+├── account.py                # Profile page + plan switching
+├── dashboard.py                # Dashboard page, scan history, scan start/poll API
+├── main_routes.py              # Landing / Features / Pricing / About
+├── plans.py                     # Pricing catalog (single source of truth)
+├── models.py                     # DB models (User, Scan)
+├── extensions.py                 # db / login_manager / oauth instances
+├── config.py                      # App config (reads from .env)
 ├── scanners/
 │   ├── security_headers.py
 │   ├── sql_injection.py
@@ -44,10 +66,10 @@ vuln_scanner_project/
 │   ├── idor_scanner.py
 │   └── api_scanner.py
 ├── vulnerable_target/
-│   └── app.py                # Test site with 5 intentional vulnerabilities
-├── templates/                 # Jinja2 HTML pages
-├── static/                    # CSS and JS
-├── reports/                   # JSON reports from CLI runs (git-ignored)
+│   └── app.py                 # Test site with 5 intentional vulnerabilities
+├── templates/                  # Jinja2 HTML pages
+├── static/                     # CSS and JS
+├── reports/                     # JSON reports from CLI runs (git-ignored)
 └── requirements.txt
 ```
 
@@ -156,8 +178,10 @@ those, point the target directly at those pages, e.g.
 - [ ] Reduce false positives / improve payload coverage in each scanner
 - [ ] Add a 6th scanner (e.g. CSRF, open redirect, directory listing)
 - [ ] Export a PDF/Excel report from scan results
-- [ ] Store per-finding history in the database (currently only a
-      summary count + status is persisted per scan)
+- [ ] Wire up a real payment processor (Stripe/Paddle) behind `account.py`'s
+      plan switcher — the UI and daily-limit logic are already in place
+- [ ] Verify student status (e.g. `.edu` email check) before granting
+      the Student plan
 - [ ] Swap `scan_manager.py`'s in-memory store for Redis if you need to
       support many concurrent scans
 

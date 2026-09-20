@@ -5,7 +5,13 @@
 <div class="dash-wrap">
   <div class="dash-header">
     <h1>Start a new scan</h1>
-    <p>Enter your test target's URL and run the automated scan pipeline.</p>
+    <p>
+      Enter your test target's URL and run the automated scan pipeline.
+      <span style="color: var(--text-muted);">
+        · {{ scans_today }}/{{ scan_limit }} scans used today on the {{ current_user.plan_label }} plan —
+        <a href="{{ url_for('main.pricing') }}" style="color: var(--accent);">upgrade</a>
+      </span>
+    </p>
   </div>
 
   <div class="dash-grid">
@@ -13,7 +19,7 @@
       <h2>Target</h2>
       <div class="field">
         <label for="target_url">Website URL</label>
-        <input type="text" id="target_url" placeholder="http://127.0.0.1:5001">
+        <input type="text" id="target_url" placeholder="http://127.0.0.1:5001/search">
       </div>
       <button id="start_scan_btn" class="btn btn-primary btn-block">Start scan</button>
 
@@ -34,7 +40,7 @@
           </thead>
           <tbody>
             {% for scan in recent_scans %}
-            <tr>
+            <tr class="scan-row" onclick="window.location='{{ url_for('dashboard.scan_detail', scan_uid=scan.scan_uid) }}'" style="cursor:pointer;">
               <td>{{ scan.target_url[:30] }}</td>
               <td>{{ scan.status }}</td>
               <td>{{ scan.findings_count }}</td>

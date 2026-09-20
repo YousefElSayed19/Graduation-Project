@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}About — RadarScan{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <span class="hero-eyebrow">/// about</span>
+  <h1>Why RadarScan exists</h1>
+</div>
+
+<div class="about-body">
+  <p>
+    RadarScan is a graduation project built to show how a small pipeline
+    of independent scan scripts can be orchestrated behind a single
+    dashboard, with results streamed live instead of delivered as a
+    static report.
+  </p>
+
+  <h2>What it is</h2>
+  <p>
+    A Flask web app that lets you register, enter a target URL, and run
+    five sequential security checks against it — security headers, SQL
+    injection, XSS, IDOR, and exposed API endpoints — while watching
+    every request and result appear in real time.
+  </p>
+
+  <h2>What it isn't</h2>
+  <p>
+    It's not a replacement for tools like Burp Suite or OWASP ZAP, and
+    it doesn't claim full coverage of any vulnerability class. Its value
+    is in demonstrating the architecture — orchestration, live logging,
+    accounts, plans, and reporting — around a set of intentionally
+    simple scan modules.
+  </p>
+
+  <h2>Responsible use</h2>
+  <ul>
+    <li>Only scan sites you own or are explicitly authorized to test.</li>
+    <li>Use the bundled <code>vulnerable_target/</code> app to try the scanners safely.</li>
+    <li>Scanning a site without permission may be illegal in your country.</li>
+  </ul>
+
+  <h2>Built by</h2>
+  <p>
+    A student team as a graduation project. See the project's README for
+    the current roadmap and how to contribute.
+  </p>
+</div>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Pricing — RadarScan{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <span class="hero-eyebrow">/// pricing</span>
+  <h1>Simple plans, built for students and small teams.</h1>
+  <p>Start free, upgrade when you outgrow the daily scan limit. This is a demo checkout — no real payment is taken.</p>
+</div>
+
+<div class="billing-toggle" id="billing_toggle">
+  <span id="label_monthly" class="active">Monthly</span>
+  <div class="switch" id="toggle_switch"><div class="knob"></div></div>
+  <span id="label_annual">Annual</span>
+  <span class="save-badge">Save ~17%</span>
+</div>
+
+<div class="pricing-grid">
+  {% for plan in plans %}
+  <div class="plan-card {% if plan.highlight %}highlight{% endif %}">
+    {% if plan.badge %}<div class="plan-badge">{{ plan.badge }}</div>{% endif %}
+    <h3>{{ plan.name }}</h3>
+    <p class="plan-tagline">{{ plan.tagline }}</p>
+
+    <div class="plan-price">
+      <span class="amount price-monthly">${{ plan.price_monthly }}</span>
+      <span class="amount price-annual" style="display:none;">${{ (plan.price_annual / 12) | round(1) }}</span>
+      <span class="period">/ month</span>
+    </div>
+    <div class="plan-annual-note">
+      {% if plan.price_annual > 0 %}
+        <span class="price-annual" style="display:none;">billed ${{ plan.price_annual }} / year</span>
+        <span class="price-monthly">or ${{ plan.price_annual }} billed annually</span>
+      {% else %}
+        &nbsp;
+      {% endif %}
+    </div>
+
+    <ul class="plan-features">
+      {% for feature in plan.features %}
+      <li>{{ feature }}</li>
+      {% endfor %}
+    </ul>
+
+    {% if current_user.is_authenticated %}
+      {% if current_user.plan == plan.id %}
+        <span class="plan-current-tag">Current plan</span>
+      {% else %}
+        <form method="POST" action="{{ url_for('account.set_plan') }}">
+          <input type="hidden" name="plan_id" value="{{ plan.id }}">
+          <input type="hidden" name="billing_cycle" class="billing-cycle-input" value="monthly">
+          <button type="submit" class="btn {% if plan.highlight %}btn-primary{% else %}btn-ghost{% endif %} btn-block">
+            {% if plan.id == 'free' %}Switch to Free{% else %}Choose {{ plan.name }}{% endif %}
+          </button>
+        </form>
+      {% endif %}
+    {% else %}
+      <a href="{{ url_for('auth.register', plan=plan.id, cycle='monthly') }}"
+         class="btn {% if plan.highlight %}btn-primary{% else %}btn-ghost{% endif %} btn-block plan-cta">
+        {% if plan.id == 'free' %}Start for free{% else %}Choose {{ plan.name }}{% endif %}
+      </a>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<div class="pricing-faq">
+  <h2>Questions</h2>
+  <div class="faq-item">
+    <h4>Is the Student plan really cheaper?</h4>
+    <p>Yes — it's priced for coursework and graduation projects. This demo doesn't verify a .edu email yet; that's on the team's to-do list.</p>
+  </div>
+  <div class="faq-item">
+    <h4>What happens when I hit my daily scan limit?</h4>
+    <p>New scans are blocked until the 24-hour window resets, and the dashboard points you to this page to upgrade.</p>
+  </div>
+  <div class="faq-item">
+    <h4>Is this connected to a real payment processor?</h4>
+    <p>Not yet. Choosing a plan updates your account instantly for demo purposes — wiring up Stripe or another processor is a good next task for the team.</p>
+  </div>
+  <div class="faq-item">
+    <h4>Can I switch plans later?</h4>
+    <p>Yes, any time, from this page or your account page.</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const toggle = document.getElementById("billing_toggle");
+  const switchEl = document.getElementById("toggle_switch");
+  const labelMonthly = document.getElementById("label_monthly");
+  const labelAnnual = document.getElementById("label_annual");
+
+  function setAnnual(isAnnual) {
+    toggle.classList.toggle("annual", isAnnual);
+    labelMonthly.classList.toggle("active", !isAnnual);
+    labelAnnual.classList.toggle("active", isAnnual);
+
+    document.querySelectorAll(".price-monthly").forEach(el => el.style.display = isAnnual ? "none" : "");
+    document.querySelectorAll(".price-annual").forEach(el => el.style.display = isAnnual ? "" : "none");
+    document.querySelectorAll(".billing-cycle-input").forEach(el => el.value = isAnnual ? "annual" : "monthly");
+    document.querySelectorAll(".plan-cta").forEach(el => {
+      const url = new URL(el.href);
+      url.searchParams.set("cycle", isAnnual ? "annual" : "monthly");
+      el.href = url.toString();
+    });
+  }
+
+  switchEl.addEventListener("click", () => setAnnual(!toggle.classList.contains("annual")));
+  labelMonthly.addEventListener("click", () => setAnnual(false));
+  labelAnnual.addEventListener("click", () => setAnnual(true));
+</script>
+{% endblock %}

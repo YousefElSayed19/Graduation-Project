@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Account — RadarScan{% endblock %}
+
+{% block content %}
+<div class="account-grid">
+  <div class="panel profile-card">
+    <div class="profile-avatar">{{ current_user.username[0] | upper }}</div>
+    <div class="profile-name">{{ current_user.username }}</div>
+    <div class="profile-email">{{ current_user.email }}</div>
+
+    <div class="profile-stat-row">
+      <span>Current plan</span>
+      <span class="plan-chip plan-{{ current_user.plan }}">{{ current_user.plan_label }}</span>
+    </div>
+    <div class="profile-stat-row">
+      <span>Billing cycle</span>
+      <span>{{ current_user.billing_cycle or "—" }}</span>
+    </div>
+    <div class="profile-stat-row">
+      <span>Sign-in method</span>
+      <span>{{ current_user.auth_provider }}</span>
+    </div>
+    <div class="profile-stat-row">
+      <span>Total scans run</span>
+      <span>{{ total_scans }}</span>
+    </div>
+    <div class="profile-stat-row">
+      <span>Member since</span>
+      <span>{{ current_user.created_at.strftime("%b %Y") }}</span>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel">
+      <h2>Your plan</h2>
+      <div class="account-plans-list">
+        {% for plan in plans %}
+        <div class="account-plan-row {% if current_user.plan == plan.id %}is-current{% endif %}">
+          <div>
+            <div class="plan-name">{{ plan.name }}</div>
+            <div class="plan-meta">{{ plan.scans_per_day }} scans / 24h · ${{ plan.price_monthly }}/mo</div>
+          </div>
+          {% if current_user.plan == plan.id %}
+            <span class="plan-current-tag">Current</span>
+          {% else %}
+            <form method="POST" action="{{ url_for('account.set_plan') }}">
+              <input type="hidden" name="plan_id" value="{{ plan.id }}">
+              <input type="hidden" name="billing_cycle" value="{{ current_user.billing_cycle or 'monthly' }}">
+              <button type="submit" class="btn btn-ghost">
+                {% if plan.id == 'free' %}Downgrade{% else %}Switch{% endif %}
+              </button>
+            </form>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <p class="empty-state" style="margin-top:16px;">
+        Need a different limit, or want to wire up real billing? See "Pricing" or the README's roadmap.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

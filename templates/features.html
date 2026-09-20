@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Features — RadarScan{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <span class="hero-eyebrow">/// scan catalog</span>
+  <h1>Five scan modules, one pipeline.</h1>
+  <p>Every scan runs all five modules below in sequence against your target and streams findings back to you as they're discovered.</p>
+</div>
+
+<div class="catalog-grid">
+  <div class="catalog-item">
+    <div class="catalog-index">01</div>
+    <div>
+      <h3>Security Headers</h3>
+      <p>Checks the target's HTTP response for well-known protective headers — Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, and Strict-Transport-Security — and flags any that are missing.</p>
+      <div class="catalog-tags"><span>misconfiguration</span><span>low effort, quick win</span></div>
+    </div>
+  </div>
+
+  <div class="catalog-item">
+    <div class="catalog-index">02</div>
+    <div>
+      <h3>SQL Injection</h3>
+      <p>Submits known error-triggering payloads to every form on the page and inspects the response for database error signatures (MySQL, PostgreSQL, SQLite and others).</p>
+      <div class="catalog-tags"><span>injection</span><span>error-based detection</span></div>
+    </div>
+  </div>
+
+  <div class="catalog-item">
+    <div class="catalog-index">03</div>
+    <div>
+      <h3>Cross-Site Scripting (XSS)</h3>
+      <p>Injects a harmless, uniquely-marked script payload into every form field and checks whether it comes back unescaped in the rendered page.</p>
+      <div class="catalog-tags"><span>injection</span><span>reflected XSS</span></div>
+    </div>
+  </div>
+
+  <div class="catalog-item">
+    <div class="catalog-index">04</div>
+    <div>
+      <h3>IDOR</h3>
+      <p>Follows links that contain a numeric identifier and swaps the ID for nearby values, flagging cases where every value returns data with no visible authorization check.</p>
+      <div class="catalog-tags"><span>access control</span><span>needs manual review</span></div>
+    </div>
+  </div>
+
+  <div class="catalog-item">
+    <div class="catalog-index">05</div>
+    <div>
+      <h3>API Security</h3>
+      <p>Probes a list of common API paths (/api/users, /api/admin, and more) with no Authorization header, flagging any endpoint that returns JSON data unprotected.</p>
+      <div class="catalog-tags"><span>authentication</span><span>exposed endpoints</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="how-it-works">
+  <h2>How a scan runs</h2>
+  <div class="steps-row">
+    <div class="step-box">
+      <span class="step-num">STEP 1</span>
+      <h4>Enter a target</h4>
+      <p>Paste the URL of a site you own or are authorized to test.</p>
+    </div>
+    <div class="step-box">
+      <span class="step-num">STEP 2</span>
+      <h4>Pipeline runs</h4>
+      <p>All five modules run one after another against that target.</p>
+    </div>
+    <div class="step-box">
+      <span class="step-num">STEP 3</span>
+      <h4>Watch it live</h4>
+      <p>Every request and result streams into the dashboard terminal.</p>
+    </div>
+    <div class="step-box">
+      <span class="step-num">STEP 4</span>
+      <h4>Review findings</h4>
+      <p>Findings are grouped by severity and saved to your scan history.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

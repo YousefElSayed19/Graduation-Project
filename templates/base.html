@@ -14,10 +14,22 @@
       <span class="brand-mark"></span>
       RadarScan
     </a>
-    <div class="topbar-links">
+
+    <div class="topbar-center">
+      <a href="{{ url_for('main.features') }}">Features</a>
+      <a href="{{ url_for('main.pricing') }}">Pricing</a>
+      <a href="{{ url_for('main.about') }}">About</a>
       {% if current_user.is_authenticated %}
         <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
-        <span class="topbar-user">{{ current_user.username }}</span>
+      {% endif %}
+    </div>
+
+    <div class="topbar-links">
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('account.index') }}" class="topbar-user">
+          <span class="plan-chip plan-{{ current_user.plan }}">{{ current_user.plan_label }}</span>
+          {{ current_user.username }}
+        </a>
         <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost">Log out</a>
       {% else %}
         <a href="{{ url_for('auth.login') }}">Log in</a>
@@ -41,7 +53,13 @@
   </main>
 
   <footer class="site-footer">
-    <span>Graduation project — RadarScan · AI-assisted automated security scanning</span>
+    <div class="footer-links">
+      <a href="{{ url_for('main.landing') }}">RadarScan</a>
+      <a href="{{ url_for('main.features') }}">Features</a>
+      <a href="{{ url_for('main.pricing') }}">Pricing</a>
+      <a href="{{ url_for('main.about') }}">About</a>
+    </div>
+    <span>Graduation project — AI-assisted automated security scanning</span>
   </footer>
 
   {% block scripts %}{% endblock %}

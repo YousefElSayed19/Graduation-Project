@@ -6,6 +6,12 @@
   <h1>Get started with RadarScan</h1>
   <p class="subtitle">Create a free account and run your first scan in a couple of minutes.</p>
 
+  {% if preselected_plan and preselected_plan != 'free' %}
+  <div class="flash flash-info" style="margin-bottom: 18px;">
+    You picked the <strong>{{ preselected_plan | capitalize }}</strong> plan ({{ preselected_cycle }}). It'll be applied to your new account — no real payment is taken in this demo.
+  </div>
+  {% endif %}
+
   <a href="{{ url_for('auth.login_google') }}" class="btn btn-google btn-block">
     Sign up with Google
   </a>
@@ -13,6 +19,8 @@
   <div class="auth-divider">or with email</div>
 
   <form method="POST">
+    <input type="hidden" name="plan_id" value="{{ preselected_plan }}">
+    <input type="hidden" name="billing_cycle" value="{{ preselected_cycle }}">
     <div class="field">
       <label for="username">Username</label>
       <input type="text" id="username" name="username" required>

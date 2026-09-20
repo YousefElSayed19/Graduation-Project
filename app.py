@@ -30,10 +30,12 @@ def create_app():
     from main_routes import main_bp
     from auth import auth_bp
     from dashboard import dashboard_bp
+    from account import account_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(account_bp)
 
     with app.app_context():
         db.create_all()
